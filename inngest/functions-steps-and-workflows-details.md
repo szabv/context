@@ -1,0 +1,67 @@
+# Functions, Steps & Workflows
+Authoring functions, steps, and workflows, including step APIs and workflow modeling.
+Items: 63.
+
+- [AI Inference <VersionBadge version="TypeScript and Python only" />](docs/037-ai-inference.md) - Function building: You can build complex AI workflows and call model providers as steps using two-step methods, `step.ai.infer()` and `step.ai.wrap()`, or our AgentKit SDK.
+- [Background jobs](docs/055-background-jobs.md) - Function building: This guide will walk you through creating background jobs with retries in a few minutes.
+- [Build workflows configurable by your users](docs/084-build-workflows-configurable-by-your-users.md) - Function building: Users today are demanding customization and integrations from every product.
+- [Cancel on](docs/161-cancel-on.md) - Function building: Stop the execution of a running function when a specific event is received using `cancelOn`.
+- [Cancel on Events](docs/028-cancel-on-events.md) - Function building: Learn how to cancel long running functions with events.
+- [Cancel on timeouts](docs/029-cancel-on-timeouts.md) - Function building: Learn how to cancel long running functions with events.
+- [Cancellation](docs/030-cancellation.md) - Function building: Cancellation is a useful mechanism for preventing unnecessary actions based on previous actions (ex, skipping a report generation upon an account deletion) or stopping an unwanted function run composed of multiple steps (ex, deployment mistake, duplicates).
+- [Cleanup after function cancellation](docs/014-cleanup-after-function-cancellation.md) - Function building: Create a function that executes after a function run has been cancelled via event, REST API, or bulk cancellation.
+- [Components API (React)](docs/164-components-api-react.md) - Function building: The [`@inngest/workflow-kit`](https://npmjs.com/package/@inngest/workflow-kit) package provides a set of React components, enabling you to build a workflow editor UI in no time!
+- [Create Function](docs/116-create-function.md) - Function building: Define your functions using the `createFunction` method on the [Inngest client](/docs/reference/client/create).
+- [Create Function](docs/135-create-function.md) - Function building: Define your functions using the `create_function` decorator.
+- [Creating workflow actions](docs/163-creating-workflow-actions.md) - Function building: The [`@inngest/workflow-kit`](https://npmjs.com/package/@inngest/workflow-kit) package provides a [workflow engine](/docs/reference/workflow-kit/engine), enabling you to create workflow actions on the back end.
+- [Crons (Scheduled Functions)](docs/078-crons-scheduled-functions.md) - Function building: You can create scheduled jobs using cron schedules within Inngest natively.
+- [Debounce functions <VersionBadge version="v3.1.0+" />](docs/117-debounce-functions.md) - Function building: Debounce delays a function run for the given `period`, and reschedules functions for the given `period` any time new events are received while the debounce is active.
+- [Delayed Functions](docs/061-delayed-functions.md) - Function building: You can easily enqueue jobs in the future with Inngest.
+- [Ensure exclusive execution of a function](docs/121-ensure-exclusive-execution-of-a-function.md) - Function building: Ensure that only a single run of a function (_or a set of specific functions, based on specific event properties_) is running at a time.
+- [Failure handlers <VersionBadge version="TypeScript only" />](docs/031-failure-handlers.md) - Function building: If your function exhausts all of its retries, it will be marked as "Failed." You can handle this circumstance by either providing an [`onFailure/on_failure`](/docs/reference/functions/handling-failures) handler when defining your function, or by listening for the [`inngest/function.failed`](/docs/reference/system-events/inngest-function-failed) system event.
+- [Fan-out (one-to-many)](docs/064-fan-out-one-to-many.md) - Function building: How to use the fan-out pattern with Inngest to trigger multiple functions from a single event.
+- [Fetch run status and output](docs/016-fetch-run-status-and-output.md) - Function building: See how to fetch the run status and output of a function in Inngest.
+- [Fetch: performing API requests or fetching data <VersionBadge version="TypeScript only" />](docs/035-fetch-performing-api-requests-or-fetching-data.md) - Function building: The Inngest TypeScript SDK provides a `step.fetch()` API and a `fetch()` utility, enabling you to make requests to third-party APIs or fetch data in a durable way by offloading them to the Inngest Platform.
+- [Function Pausing](docs/074-function-pausing.md) - Function building: Learn how to pause an Inngest function.
+- [Function run priority <VersionBadge version="v3.2.1+" />](docs/120-function-run-priority.md) - Function building: You can prioritize specific function runs above other runs **within the same function**.
+- [Handling Failures](docs/118-handling-failures.md) - Function building: Define any failure handlers for your function with the [`onFailure`](/docs/reference/functions/create#configuration) option.
+- [Inngest Errors](docs/032-inngest-errors.md) - Function building: Inngest automatically handles errors and retries for you.
+- [Inngest Functions](docs/040-inngest-functions.md) - Function building: Inngest functions enable developers to run reliable background logic, from background jobs to complex workflows.
+- [Inngest Functions](docs/091-inngest-functions.md) - Function building: Learn what Inngest functions are and of what they are capable.
+- [Inngest Steps](docs/092-inngest-steps.md) - Function building: Learn about Inngest steps and their methods.
+- [Invoke <VersionBadge version="v0.3.0+" />](docs/147-invoke.md) - Function building: Calls another Inngest function, waits for its completion, and returns its output.
+- [Invoke <VersionBadge version="v3.7.0+" />](docs/122-invoke.md) - Function building: Use `step.invoke()` to asynchronously call another function and handle the result.
+- [Invoke by ID <VersionBadge version="v0.3.0+" />](docs/148-invoke-by-id.md) - Function building: Calls another Inngest function, waits for its completion, and returns its output.
+- [Invoking functions directly](docs/069-invoking-functions-directly.md) - Function building: Inngest's `step.invoke()` function provides a powerful tool for calling functions directly within your event-driven system.
+- [Managing concurrency](docs/050-managing-concurrency.md) - Function building: Limit the number of concurrently running steps for your function with the [`concurrency`](/docs/reference/functions/create#configuration) configuration options.
+- [Multi-Step Functions](docs/072-multi-step-functions.md) - Function building: Use Inngest's multi-step functions to safely coordinate events, delay execution for hours (or up to a year), retry [individual steps](/docs/learn/inngest-steps), and conditionally run code based on the result of previous steps and incoming events.
+- [Parallel <VersionBadge version="v0.3.0+" />](docs/149-parallel.md) - Function building: Run steps in parallel.
+- [Rate limit function execution](docs/119-rate-limit-function-execution.md) - Function building: Set a _hard limit_ on how many function runs can start within a time period.
+- [Realtime: Stream updates from Inngest functions](docs/021-realtime-stream-updates-from-inngest-functions.md) - Function building: Stream updates and enable real-time workflows with Inngest functions.
+- [Referencing functions](docs/051-referencing-functions.md) - Function building: Using [`step.invoke()`](/docs/reference/functions/step-invoke), you can directly call one Inngest function from another and handle the result.
+- [Retries](docs/033-retries.md) - Function building: By default, in _addition_ to the **initial attempt**, Inngest will retry a function or a step up to 4 times until it succeeds.
+- [Rollbacks](docs/034-rollbacks.md) - Function building: Unlike an error being thrown in the main function's body, a failing step (one that has exhausted all retries) will throw a `StepError`.
+- [Run](docs/123-run.md) - Function building: Use `step.run()` to run synchronous or asynchronous code as a retriable step in your function.
+- [Run](docs/150-run.md) - Function building: Turn a normal function into a durable function.
+- [Scheduling a one-off function](docs/022-scheduling-a-one-off-function.md) - Function building: Schedule a function to run at a specific time in the future.
+- [Send Event](docs/124-send-event.md) - Function building: Use to send event(s) reliably within your function.
+- [Send event](docs/151-send-event.md) - Function building: Note: This guide is for sending events from *inside* an Inngest function.
+- [Sending events from functions](docs/079-sending-events-from-functions.md) - Function building: How to send events from within functions to trigger other functions to run in parallel.
+- [Serve](docs/156-serve.md) - Function building: The `serve()` API handler is used to serve your application's [functions](/docs/reference/functions/create) via HTTP.
+- [Singleton Functions <VersionBadge version="TypeScript v3.39.0+" /> <VersionBadge version="Go SDK v0.12.0+" /> <VersionBadge version="Python v0.5+" />](docs/080-singleton-functions.md) - Function building: Singleton Functions enable you to ensure that only a single run of your function (_or a set of specific function runs, based on specific event properties_) is happening at a time.
+- [Sleep](docs/153-sleep.md) - Function building: Sleep for a period of time.
+- [Sleep `step.sleep()`](docs/126-sleep-step-sleep.md) - Function building: The ID of the step.
+- [Sleep until](docs/152-sleep-until.md) - Function building: Sleep until a specific time.
+- [Sleep until `step.sleepUntil()`](docs/125-sleep-until-step-sleepuntil.md) - Function building: The ID of the step.
+- [Sleeps](docs/036-sleeps.md) - Function building: Two step methods, `step.sleep` and `step.sleepUntil`, are available to pause the execution of your function for a specific amount of time.
+- [Step parallelism](docs/081-step-parallelism.md) - Function building: If you're using a serverless platform to host, code will run in true parallelism similar to multi-threading (without shared state).
+- [Steps & Workflows](docs/039-steps-and-workflows.md) - Function building: Steps are fundamental building blocks of Inngest, turning your Inngest Functions into reliable workflows that can runs for months and recover from failures.
+- [Track all function failures in Datadog](docs/023-track-all-function-failures-in-datadog.md) - Function building: Create a function that handles all function failures in an Inngest environment and forwards them to Datadog.
+- [Using the workflow engine](docs/165-using-the-workflow-engine.md) - Function building: The workflow `Engine` is used to run a given [workflow instance](/docs/reference/workflow-kit/workflow-instance) within an Inngest Function.
+- [Wait for an Event](docs/038-wait-for-an-event.md) - Function building: One step method is available to pause a Function's run until a given event is sent.
+- [Wait for event](docs/127-wait-for-event.md) - Function building: The ID of the step.
+- [Wait for event](docs/154-wait-for-event.md) - Function building: Wait until the Inngest server receives a specific event.
+- [Workflow instance](docs/167-workflow-instance.md) - Function building: A workflow instance represents a user configuration of a sequence of [workflow actions](/docs/reference/workflow-kit/actions), later provided to the [workflow engine](/docs/reference/workflow-kit/engine) for execution.
+- [Workflow Kit](docs/166-workflow-kit.md) - Function building: Workflow Kit enables you to build [user-defined workflows](/docs/guides/user-defined-workflows) with Inngest by providing a set of workflow actions to the **[Workflow Engine](/docs/reference/workflow-kit/engine)** while using the **[pre-built React components](/docs/reference/workflow-kit/components-api)** to build your Workflow Editor UI.
+- [Working with Loops in Inngest](docs/085-working-with-loops-in-inngest.md) - Function building: Implement loops in your Inngest functions and avoid common pitfalls.
+- [Writing expressions](docs/086-writing-expressions.md) - Function building: Expressions are used in a number of ways for configuring your functions.
