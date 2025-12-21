@@ -1,8 +1,9 @@
 # Examples & Recipes
 End-to-end examples and solution patterns you can adapt.
-Items: 11.
+Items: 12.
 
 - [AI Agents and RAG](docs/013-ai-agents-and-rag.md) - Example: Learn how to use Inngest for AI automated workflows, AI agents, and RAG.
+- [Customer Service AI Workflow Cookbook](docs/180-customer-service-ai-workflow-cookbook.md) - Example: Patterns for building a two-step AI customer service workflow in TypeScript.
 - [Cleanup after function cancellation](docs/014-cleanup-after-function-cancellation.md) - Example: Create a function that executes after a function run has been cancelled via event, REST API, or bulk cancellation.
 - [Cloudflare Workers environment variables and context](docs/019-cloudflare-workers-environment-variables-and-context.md) - Example: Cloudflare Workers does not set environment variables a global object like Node.js does with `process.env`.
 - [Email Sequence](docs/015-email-sequence.md) - Example: See how to implement an email sequence with Inngest.
