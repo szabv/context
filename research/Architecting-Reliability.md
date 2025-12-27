@@ -1,5 +1,7 @@
-Architecting Reliability: A Comprehensive Report on Decomposition, Boundaries, and Verification in Agentic Coding Systems
-Executive Summary
+# Architecting Reliability: A Comprehensive Report on Decomposition, Boundaries, and Verification in Agentic Coding Systems
+
+## Executive Summary
+
 The software engineering discipline stands at a pivotal juncture where the integration of Large Language Models (LLMs) is transitioning from stochastic, prompt-based code generation—colloquially termed "vibe coding"—to deterministic, specification-driven agentic engineering. This shift represents the critical maturation phase of Artificial Intelligence in the Software Development Lifecycle (SDLC). While LLMs have demonstrated proficiency in generating isolated code snippets, their deployment as autonomous agents capable of resolving complex engineering tasks reveals significant reliability gaps when architectural guardrails are absent.
 
 Recent research indicates that multi-agent systems (MAS) fail in production environments at rates between 41% and 86.7%. These failures are rarely attributable to a lack of model "intelligence" or raw reasoning capability. Instead, the vast majority of breakdowns originate from inadequate specification (41.77%), coordination failures (36.94%), and the absence of rigid boundary constraints. As organizations attempt to scale from single-turn completions to multi-turn autonomous problem solving, the primary challenge shifts from prompt engineering to context engineering and task decomposition.
