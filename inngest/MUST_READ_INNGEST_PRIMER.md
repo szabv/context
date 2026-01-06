@@ -100,6 +100,12 @@ The following index serves as the foundational truth for the design system. Ever
     - **Supports:** `patterns`, `ai`, `agents`
     - **Relevance:** Offers reference architectures for RAG, autonomous agents, and long-running AI processes, serving as the basis for the agentic patterns in this report.17
 
+17. **Realtime & Streaming**
+
+    - **URL:** `https://www.inngest.com/docs/features/realtime`
+    - **Supports:** `realtime`, `streaming`, `websocket`, `publish`, `subscribe`
+    - **Relevance:** Enables streaming updates from workflows to clients via WebSocket, replacing polling patterns. Covers channels, topics, publish/subscribe patterns, and at-most-once delivery guarantees.
+
 ---
 
 ## B) Hard Invariants: "Paint Inside the Lines"
@@ -564,3 +570,225 @@ Goal: [One sentence objective]
 
 - **Use Case**: Send follow-up email 30 days later.
 - **Key Primitive**: `step.sleep('30d')`.
+
+---
+
+## G) Realtime: Streaming Results from Workflows
+
+### G1) Overview
+
+Inngest Realtime enables streaming updates from workflows to clients via WebSocket. This replaces polling patterns for getting workflow results.
+
+**Key Components:**
+- **Channels**: Namespaces for data (e.g., `request:${requestId}`, `user:${userId}`)
+- **Topics**: Categories within channels (e.g., `result`, `progress`, `logs`)
+- **publish()**: Function available in workflow handlers to send data
+- **subscribe()**: Client function to receive data via WebSocket
+
+### G2) Hard Rules for Realtime
+
+**1. At-Most-Once Delivery**
+- Messages are delivered at-most-once and are ephemeral
+- **Critical**: Subscribe BEFORE sending the triggering event to avoid missing messages
+- If the subscriber connects after the message is published, it's lost
+
+**2. Stream Lifecycle**
+- Streams stay open until explicitly closed by the client
+- No built-in "completion" signal - workflows must publish a completion message
+- Client must call `stream.close()` when done to release resources
+
+**3. Max Message Size**
+- Messages are capped at 512KB
+- Large payloads should use references (e.g., S3 URLs) instead of inline data
+
+**4. Token Requirements**
+- **Server-side**: No token needed - use `subscribe(inngest, { channel, topics })`
+- **Browser-side**: Requires token from `getSubscriptionToken()` (expires in 1 minute)
+
+### G3) Publishing from Workflows
+
+**Setup**: Add `realtimeMiddleware()` to the Inngest client:
+```typescript
+import { realtimeMiddleware } from "@inngest/realtime";
+
+const inngest = new Inngest({
+  id: "my-app",
+  middleware: [realtimeMiddleware()],
+});
+```
+
+**Usage**: The `publish` function becomes available in handlers:
+```typescript
+inngest.createFunction(
+  { id: "my-workflow" },
+  { event: "my/event" },
+  async ({ event, step, publish }) => {
+    const result = await step.run("do-work", async () => {
+      // ... business logic
+      return { data: "result" };
+    });
+
+    // Publish result before returning
+    await publish({
+      channel: `request:${event.data.request_id}`,
+      topic: "result",
+      data: result,
+    });
+
+    return result;
+  }
+);
+```
+
+**Typed Channels** (recommended):
+```typescript
+import { channel, topic } from "@inngest/realtime";
+
+const requestChannel = channel((requestId: string) => `request:${requestId}`)
+  .addTopic(topic("result").type<{ ok: boolean; data?: unknown }>());
+
+// In workflow:
+await publish(requestChannel(event.data.request_id).result({ ok: true, data }));
+```
+
+### G4) Subscribing to Results
+
+**Server-side Pattern** (for MCP tools, API handlers):
+```typescript
+import { subscribe } from "@inngest/realtime";
+
+async function sendAndWaitForResult(inngest, event, requestId, timeout) {
+  // 1. Subscribe FIRST (before sending event)
+  const stream = await subscribe(inngest, {
+    channel: `request:${requestId}`,
+    topics: ["result"],
+  });
+
+  try {
+    // 2. Send event AFTER subscription is ready
+    await inngest.send(event);
+
+    // 3. Wait for result with timeout
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), timeout)
+    );
+
+    for await (const message of stream) {
+      return message.data; // Return first message
+    }
+  } finally {
+    // 4. Always close stream
+    stream.close();
+  }
+}
+```
+
+**HTTP Streaming Pattern** (for Next.js/Express):
+```typescript
+export async function POST(req: Request) {
+  const { prompt } = await req.json();
+  const uuid = crypto.randomUUID();
+
+  await inngest.send({ name: "my/event", data: { uuid, prompt } });
+
+  const stream = await subscribe(inngest, {
+    channel: `request:${uuid}`,
+    topics: ["updates"],
+  });
+
+  return new Response(stream.getEncodedStream(), {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
+```
+
+### G5) Realtime Anti-Patterns
+
+**1. Subscribe After Send**
+- **Bad**: `await inngest.send(event); const stream = await subscribe(...);`
+- **Good**: Subscribe first, then send
+- **Why**: At-most-once delivery means you miss the message if not subscribed
+
+**2. Forgetting to Close Stream**
+- **Bad**: Not calling `stream.close()` after receiving result
+- **Good**: Use try/finally to ensure cleanup
+- **Why**: Leaves WebSocket connections open, potential resource leak
+
+**3. No Completion Signal**
+- **Bad**: Expecting stream to auto-close when workflow completes
+- **Good**: Publish explicit completion message, subscriber closes on receipt
+- **Why**: Streams are persistent by design
+
+**4. Polling Instead of Realtime**
+- **Bad**: `while (!done) { checkStatus(); sleep(); }`
+- **Good**: Subscribe to channel, wait for message
+- **Why**: Polling wastes resources and adds latency
+
+### G6) When to Use Realtime vs Polling
+
+| Scenario | Use Realtime | Use Polling |
+|----------|--------------|-------------|
+| Need immediate result notification | ✅ | |
+| Client can maintain WebSocket | ✅ | |
+| Serverless/Lambda environment | ✅ | |
+| Simple one-off status check | | ✅ |
+| Debugging/Admin tools | | ✅ |
+| Workflows > 1 minute | ✅ | |
+
+### G7) Testing Realtime Publishing
+
+The `@inngest/realtime` middleware intercepts `publish` calls and wraps them via `step.run("publish:${channel}", ...)`. This makes mocking `publish` directly ineffective since middleware overwrites context.
+
+**Strategy**: Spy on `client.inngestApi.publish` which receives the final payload:
+
+```typescript
+// In test helper (e.g., inngest-test-engine.ts)
+export interface PublishCall {
+  channel: string;
+  topic: string;
+  data: unknown;
+}
+
+const publishCalls: PublishCall[] = [];
+const fnAny = options.fn as { client?: { inngestApi?: { publish?: unknown } } };
+const client = fnAny.client;
+
+if (client?.inngestApi) {
+  client.inngestApi.publish = vi.fn().mockImplementation(
+    async (opts: { channel: string; topics: string[] }, data: unknown) => {
+      publishCalls.push({
+        channel: opts.channel,
+        topic: opts.topics[0] || "result",
+        data,
+      });
+      return { ok: true };
+    }
+  );
+}
+```
+
+**Test assertions**:
+```typescript
+expect(publish).toHaveBeenCalled();
+const publishCall = publish.mock.calls[0][0] as {
+  channel: string;
+  topic: string;
+  data: unknown;
+};
+expect(publishCall.channel).toBe(`request:${eventData.request_id}`);
+expect(publishCall.topic).toBe("result");
+expect(publishCall.data).toEqual({
+  success: true,
+  data: { memory: mockMemory },
+});
+```
+
+This verifies the workflow publishes correct channel, topic, and payload.
+
+### G8) Developer Preview Notice
+
+Realtime is in developer preview (as of SDK v3.32.0+). APIs may change. Available on all billing plans during preview.
